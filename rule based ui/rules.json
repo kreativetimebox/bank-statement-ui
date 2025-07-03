@@ -1,0 +1,9 @@
+[
+  {
+    "supplier": "abc traders",
+    "min_amount": 1000.0,
+    "max_amount": 15000.0,
+    "logic": "AND",
+    "category": "Maintenance"
+  }
+]
