@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "input_file": "Arul Paul Invoice-1.pdf",
+    "extraction_timestamp": "2025-08-05T18:47:58.277995",
+    "processing_device": "cpu",
+    "model_used": "microsoft/phi-3-mini-128k-instruct"
+  },
+  "raw_text_preview": "Yes Group Intl Ltd –International House –Cray Avenue-Orpinghton-Bromely-BR5 3RS \n Ph.: 02070603999   info@yesgroupint.com    www.yesgroupint.com \n Company No:5566453     VAT NO: 874 341513 \n \n \n Yes Group International Ltd \n \nInvoice \n \nTo: \nCapita Business Services Ltd                             \n  \n \nCost Centre: PSES \nAccounts Payable PSES                                                      \nPO Box 202                                                           \n \nInvoice date: 09-09-2014 \nDa...",
+  "extracted_data": {
+    "invoice_number": "0801",
+    "invoice_date": "09-09-2014",
+    "vendor_name": "Yes Group Intl Ltd",
+    "items": [
+      {
+        "description": "18th August to 22nd August",
+        "quantity": "5",
+        "unit_price": "515.00",
+        "total_price": "2575.00",
+        "confidence": 0.95
+      },
+      {
+        "description": "26th August to 29th August",
+        "quantity": "4",
+        "unit_price": "515.00",
+        "total_price": "2060.00",
+        "confidence": 0.95
+      }
+    ],
+    "totals_section": {
+      "Net Total": "£4635.00",
+      "VAT": "£927.00",
+      "Total": "£5562.00",
+      "confidence": 0.98
+    },
+    "payment_terms": {
+      "due_date": "Not specified",
+      "instructions": "All Cheques are payable to Yes Group Intl Ltd",
+      "confidence": 0.85
+    },
+    "customer_details": {
+      "name": "Capita Business Services Ltd",
+      "address": "PO Box 202, Darlington, DL1 9HB",
+      "contact_information": "Not specified",
+      "confidence": 0.9
+    },
+    "additional_notes": "Not specified"
+  }
+}

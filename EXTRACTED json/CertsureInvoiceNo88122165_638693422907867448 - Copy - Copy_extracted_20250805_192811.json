@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "input_file": "CertsureInvoiceNo88122165_638693422907867448 - Copy - Copy.pdf",
+    "extraction_timestamp": "2025-08-05T19:28:11.104900",
+    "processing_device": "cpu",
+    "model_used": "microsoft/phi-3-mini-128k-instruct"
+  },
+  "raw_text_preview": "Certsure LLP\nWarwick House\nHoughton Hall Park\nHoughton Regis\nDUNSTABLE LU5 5ZX\nPage 1 of 2  \nInvoice\nVAT REG No. GB155441713\nBill-To-Party\nA Moor Electrical Ltd\n5 Kevlyn Cresent\nOld Netley\nSouthampton\nSO31 8EX\nShip-To-Party\nA Moor Electrical Ltd\n5 Kevlyn Cresent\nOld Netley\nSouthampton SO31 8EX\nInformation\nInvoice Number\n88122165\nDate of Issue\n09.10.2024\nReference Order\n2978590/ 10.10.2024\nAccount No.\n3036273\nCurrency\nGBP\nPayment Terms\n28th of this month by DD\nDescription\nSubmissions made between...",
+  "extracted_data": {
+    "invoice_number": {
+      "value": "88122165",
+      "confidence": 1.0
+    },
+    "invoice_date": {
+      "value": "09.10.2024",
+      "confidence": 1.0
+    },
+    "vendor_name": {
+      "value": "Certsure LLP",
+      "confidence": 1.0
+    },
+    "items": [
+      {
+        "description": "CNOCPRSN18_2",
+        "quantity": "1",
+        "unit_price": "1.50",
+        "total_price": "1.50",
+        "confidence": 1.0
+      },
+      {
+        "description": "CNOCEICR18_2C",
+        "quantity": "7",
+        "unit_price": "1.50",
+        "total_price": "10.50",
+        "confidence": 1.0
+      },
+      {
+        "description": "CNOCEIC18_2C",
+        "quantity": "1",
+        "unit_price": "1.50",
+        "total_price": "1.50",
+        "confidence": 1.0
+      },
+      {
+        "description": "BCE_011",
+        "quantity": "1",
+        "unit_price": "3.75",
+        "total_price": "3.75",
+        "confidence": 1.0
+      }
+    ],
+    "totals_section": {
+      "Sub-Total": "17.25",
+      "VAT-Total": "3.45",
+      "Invoice Amount": "20.70",
+      "confidence": 1.0
+    },
+    "payment_terms": {
+      "due_date": "28th of this month by DD",
+      "method": "Direct Debit",
+      "DD No.": "1",
+      "date": "28.10.2024",
+      "amount": "20.70",
+      "confidence": 1.0
+    },
+    "customer_details": {
+      "name": "A Moor Electrical Ltd",
+      "address": "5 Kevlyn Cresent, Old Netley, Southampton SO31 8EX",
+      "account_no": "3036273",
+      "confidence": 1.0
+    },
+    "additional_notes": {
+      "text": "This invoice is for information purposes only. The amount due will be collected by Direct Debit on or immediately after the dates detailed above.",
+      "confidence": 1.0
+    }
+  }
+}

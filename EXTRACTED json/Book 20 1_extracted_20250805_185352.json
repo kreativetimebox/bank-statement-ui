@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "input_file": "Book 20 1.pdf",
+    "extraction_timestamp": "2025-08-05T18:53:52.350378",
+    "processing_device": "cpu",
+    "model_used": "microsoft/phi-3-mini-128k-instruct"
+  },
+  "raw_text_preview": "INVOICE\nInvoice #:\n10654\nInvoice date:\n11/27/2024\nJob:\nWedding florals\n345 W Main\nBill to:\nHailey Clark\nLos Angeles, CA 14151\nAddress:\n123 Avenue A, \nP: 915-555-0195\nBurbank, CA 56789\nF: 915-555-0105\nPhone:\n805-555-0185\nelegantembrace@example.com\nFax:\nNA\nItem #\nDescription\nQty\nUnit price\nDiscount\nPrice\nA875\nPeonies\n35\n$100.00\n$10.00\n$3,490.00\nK245\nTulips\n25\n$2.00\n$20.00\n$30.00\nU123\nButtercup\n30\n$30.00\n$900.00\nInvoice Subtotal\n$4,420.00\nTax Rate\n6.00%\nSales Tax\n$265.20\nDeposit Received\n$50.00\nTOT...",
+  "extracted_data": {
+    "invoice_number": {
+      "value": "10654",
+      "confidence": 1.0
+    },
+    "invoice_date": {
+      "value": "11/27/2024",
+      "confidence": 1.0
+    },
+    "vendor_name": {
+      "value": "Elegant Embrace",
+      "confidence": 0.9
+    },
+    "items": [
+      {
+        "description": "Peonies",
+        "quantity": "35",
+        "unit_price": "$100.00",
+        "total_price": "$3,490.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Tulips",
+        "quantity": "25",
+        "unit_price": "$2.00",
+        "total_price": "$30.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Buttercup",
+        "quantity": "30",
+        "unit_price": "$30.00",
+        "total_price": "$900.00",
+        "confidence": 1.0
+      }
+    ],
+    "totals_section": {
+      "Invoice Subtotal": "$4,420.00",
+      "Tax Rate": "6.00%",
+      "Sales Tax": "$265.20",
+      "Deposit Received": "$50.00",
+      "Total": "$4,370.00",
+      "confidence": 1.0
+    },
+    "payment_terms": {
+      "due_date": "90 days",
+      "overdue_service_charge": "1.5% per month",
+      "confidence": 0.9
+    },
+    "customer_details": {
+      "name": "Hailey Clark",
+      "address": "123 Avenue A, Los Angeles, CA 14151",
+      "contact_phone": "915-555-0195",
+      "contact_fax": "NA",
+      "email": "elegantembrace@example.com",
+      "confidence": 0.9
+    },
+    "additional_notes": {
+      "text": "Please make all checks payable to Elegant Embrace.",
+      "confidence": 1.0
+    }
+  }
+}

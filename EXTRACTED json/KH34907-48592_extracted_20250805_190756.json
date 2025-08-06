@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "input_file": "KH34907-48592.pdf",
+    "extraction_timestamp": "2025-08-05T19:07:56.542969",
+    "processing_device": "cpu",
+    "model_used": "microsoft/phi-3-mini-128k-instruct"
+  },
+  "raw_text_preview": "Invoice48592\nYes Group International\nAvanta Capital Place,\n120 Bath Road,\nHarlington, Hayes\nMIDDLESEX\nUB3 5AN\nCustomer Order/Cost Centre:\nDate & Tax Point: 17/07/2014\nClient Ref No: KH34907\nUnit Price\nQuantity\nCompany Reference:\nYES\nPlease note all figures are in £ sterling\nDetails\nVAT Amount\nTotal Net\n850.00\n850.00\n170.00\n1\nOur fee to assign a Certifcate of Sponsorship Only\nIn respect of \nRamya Duttuluri\n800.00\n800.00\n160.00\n1\nLeave to Remain - Initial Application; Tier 2 General\nIn respect of ...",
+  "extracted_data": {
+    "invoice_number": {
+      "value": "48592",
+      "confidence": 1.0
+    },
+    "invoice_date": {
+      "value": "17/07/2014",
+      "confidence": 1.0
+    },
+    "vendor_name": {
+      "value": "Yes Group International",
+      "confidence": 1.0
+    },
+    "items": [
+      {
+        "description": "Our fee to assign a Certifcate of Sponsorship Only",
+        "quantity": "1",
+        "unit_price": "850.00",
+        "total_price": "850.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Leave to Remain - Initial Application; Tier 2 General",
+        "quantity": "1",
+        "unit_price": "200.00",
+        "total_price": "200.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Leave to Remain - Initial Application -Dependant",
+        "quantity": "1",
+        "unit_price": "1001.00",
+        "total_price": "1001.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Home Office Fees - Ramya Duttuluri",
+        "quantity": "1",
+        "unit_price": "184.00",
+        "total_price": "184.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "UKBA Certificate of Sponsorship Fee  - Ramya Duttuluri",
+        "quantity": "1",
+        "unit_price": "30.00",
+        "total_price": "30.00",
+        "confidence": 1.0
+      },
+      {
+        "description": "Administration Fee - Payment Fee",
+        "quantity": "1",
+        "unit_price": "4442.00",
+        "total_price": "4442.00",
+        "confidence": 1.0
+      }
+    ],
+    "totals_section": {
+      "Net Total": "376.00",
+      "Total VAT Amount": "0.00",
+      "Carriage": "4066.00",
+      "confidence": 1.0
+    },
+    "payment_terms": {
+      "Payment within 30 days": "true",
+      "specific payment instructions": "Make any cheques payable to Dearson  Winyard International Ltd.",
+      "confidence": 1.0
+    },
+    "customer_details": {
+      "name": "Ramya Duttuluri",
+      "address": "Avanta Capital Place, 120 Bath Road, Harlington, Hayes, MIDDLESEX, UB3 5AN",
+      "contact_information": "Not provided",
+      "confidence": 0.8
+    },
+    "additional_notes": {
+      "value": "Please make any cheques payable to Dearson  Winyard International Ltd.",
+      "confidence": 1.0
+    }
+  }
+}
