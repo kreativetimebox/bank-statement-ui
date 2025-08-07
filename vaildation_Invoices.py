@@ -2,10 +2,17 @@ import json, streamlit as st
 from PIL import Image
 import fitz
 from functools import partial
+import re
 
 def val(x): return x.get("value","") if isinstance(x,dict) else x or ""
 def conf(x): return float(x.get("confidence",0)) if isinstance(x,dict) else 0.0
-def first(d,keys): return next((d[k] for k in d), "")
+def first(d, keys):
+    # d: dict, keys: list of alternative field names (strings)
+    for k in keys:
+        if k in d:
+            return d[k]
+    return ""
+
 
 def set_row_edit_true(idx):
     st.session_state.row_editing[idx] = True
@@ -13,6 +20,59 @@ def set_row_edit_true(idx):
 def set_row_edit_false(idx, pending_row_key, orig_row):
     st.session_state[pending_row_key] = dict(orig_row)
     st.session_state.row_editing[idx] = False
+
+
+
+def extract_amount(val):
+    # Remove common currency symbols and thousand separators
+    if not val: return 0.0
+    # Remove currency and space
+    num = re.sub(r'[^0-9.\-]', '', str(val))
+    try:
+        return float(num)
+    except Exception:
+        return 0.0
+    
+def select_best_total(totals):
+    """
+    Prefer explicit total/amount due fields (case-insensitive).
+    Fallback to the largest value only if no clear field is found.
+    """
+    if not totals: return ""
+    # Lowercase mapping for case-insensitive matching
+    key_map = {k.lower(): k for k in totals}
+    # Ordered by best to worst
+    main_fields = [
+        "total", "grand total", "total amount", "invoice amount", "total due", "amount due",
+        "total payable", "balance due", "amount owed", "amount receivable", "carriage",
+        "payable amount", "amount_due"
+    ]
+    secondary_fields = [
+        "sub-total", "net total", "invoice subtotal", "sub total", "subtotal"
+    ]
+
+    for field in main_fields:
+        if field.lower() in key_map and totals[key_map[field.lower()]]:
+            return totals[key_map[field.lower()]]
+
+    for field in secondary_fields:
+        if field.lower() in key_map and totals[key_map[field.lower()]]:
+            return totals[key_map[field.lower()]]
+
+    # Fallback: largest numeric value
+    all_values = [v for v in totals.values() if isinstance(v, str) and any(ch.isdigit() for ch in v)]
+    def extract_amount(val):
+        import re
+        num = re.sub(r'[^\d.\-]', '', str(val))
+        try:
+            return float(num)
+        except Exception:
+            return 0.0
+    amounts = [extract_amount(v) for v in all_values]
+    if amounts:
+        idx = amounts.index(max(amounts))
+        return all_values[idx]
+    return ""
 
 def parse(f):
     d = json.load(f)
@@ -22,18 +82,22 @@ def parse(f):
     dat = ext.get("invoice_date")
     cust= ext.get("customer_details",{})
     tot = ext.get("totals_section") or ext.get("totals") or {}
+
+    # Use select_best_total for correct selection
+    total_val = select_best_total(tot)
+
     return dict(
-        supplier_name =val(sup),  supplier_conf =conf(sup),
-        invoice_number=val(num),  inv_num_conf  =conf(num),
-        invoice_date  =val(dat),  inv_date_conf =conf(dat),
-        customer_name =val(cust.get("name","")),  cust_conf     =conf(cust),
-        customer_address=cust.get("address",""), cust_addr_conf =conf(cust),
-        total = val(first(tot,["Total","Grand Total","total_amount","Total Amount",
-                               "Invoice Amount","Net Total"])).replace("£","").replace("$","").strip(),
+        supplier_name = val(sup), supplier_conf = conf(sup),
+        invoice_number= val(num), inv_num_conf = conf(num),
+        invoice_date = val(dat), inv_date_conf = conf(dat),
+        customer_name = val(cust.get("name","")), cust_conf = conf(cust),
+        customer_address= cust.get("address",""), cust_addr_conf = conf(cust),
+        total = str(total_val).replace("£","").replace("$","").strip(),
         total_conf=conf(tot),
         line_items = ext.get("items",[]),
         expected_confidence = 0.85
     )
+
 
 def download(d):
     st.download_button("Download updated JSON",
@@ -180,79 +244,90 @@ with right:
     for label, v_key, c_key in fields:
         draw_field(label, v_key, c_key)
 
-# ---------- line items ----------
 st.subheader("Line items")
 fields_tag = [("desc", "description"), ("qty", "quantity"), ("unit", "unit_price"), ("total", "total_price")]
-cols_hdr = st.columns([3,1,1,1,1,1])
-for txt, col in zip(["Desc","Qty","Unit","Total","Conf","Edit"], cols_hdr):
-    col.markdown(f"**{txt}**")
 
-any_row_edit = False
-for i, item in enumerate(st.session_state.line_items):
-    cf = item.get("confidence", 0.0)
-    edit = st.session_state.row_editing[i]
-    any_row_edit = any_row_edit or edit
-    pending_row_key = f"pending_row_{i}"
-    if pending_row_key not in st.session_state:
-        st.session_state[pending_row_key] = dict(item)
-    editable = (cf < thr) or edit
+with st.container():
+    cols_hdr = st.columns([3,1,1,1,1,1])
+    for txt, col in zip(["Desc","Qty","Unit","Total","Conf","Edit"], cols_hdr):
+        col.markdown(f"**{txt}**")
 
-    for j, (tag, field) in enumerate(fields_tag):
-        bg = "#ff0000" if editable else "#00ff3c"
-        txt = "#fff" if editable else "#000"
-        aria = f"{tag}_{i}"
-        st.markdown(f"""
-        <style>
-        input[aria-label="{aria}"],
-        input[aria-label="{aria}"]:disabled {{
-            background:{bg} !important;
-            color:{txt} !important;
-            -webkit-text-fill-color:{txt} !important;
-            font-weight:600 !important;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-        if editable:
-            val_now = cols_hdr[j].text_input(
-                aria, st.session_state[pending_row_key][field],
-                key=f"{aria}_pending_input", label_visibility="collapsed")
-            # track if any cell differs from last committed value (after validation)
-            if val_now != st.session_state.line_items[i][field]:
-                st.session_state.edited_items[i] = True
-            st.session_state[pending_row_key][field] = val_now
+    any_row_edit = False
+    for i, item in enumerate(st.session_state.line_items):
+        cf = item.get("confidence", 0.0)
+        edit = st.session_state.row_editing[i]
+        any_row_edit = any_row_edit or edit
+        pending_row_key = f"pending_row_{i}"
+        if pending_row_key not in st.session_state:
+            st.session_state[pending_row_key] = dict(item)
+        editable = (cf < thr) or edit
+
+        # store widgets for rendering the row
+        row_cols = st.columns([3,1,1,1,1,1], gap="small")
+        for j, (tag, field) in enumerate(fields_tag):
+            bg = "#ff0000" if editable else "#00ff3c"
+            txt_color = "#fff" if editable else "#000"
+            aria = f"{tag}_{i}"
+            row_cols[j].markdown(
+                f"""
+                <style>
+                input[aria-label="{aria}"],
+                input[aria-label="{aria}"]:disabled {{
+                    background:{bg} !important;
+                    color:{txt_color} !important;
+                    -webkit-text-fill-color:{txt_color} !important;
+                    font-weight:600 !important;
+                    margin-bottom: 0 !important;
+                }}
+                </style>
+                """, unsafe_allow_html=True)
+            if editable:
+                val_now = row_cols[j].text_input(
+                    aria, st.session_state[pending_row_key][field],
+                    key=f"{aria}_pending_input", label_visibility="collapsed")
+                if val_now != st.session_state.line_items[i][field]:
+                    st.session_state.edited_items[i] = True
+                st.session_state[pending_row_key][field] = val_now
+            else:
+                row_cols[j].text_input(
+                    aria, st.session_state[pending_row_key][field],
+                    key=f"{aria}_input", disabled=True, label_visibility="collapsed")
+        # **Conf alignment fix here**
+        conf_color = "#dc3545" if cf < thr else "#28a745"
+        row_cols[4].markdown(
+            f"<span style='color:{conf_color}; font-weight:bold; display: block; text-align: left; "
+            f"line-height: 38px; margin-bottom: 0;'>{cf:.2f}</span>",
+            unsafe_allow_html=True)
+        # Only one edit/cancel per row in last col
+        if cf >= thr:
+            btn_label = "Cancel" if edit else "Edit"
+            if not edit:
+                row_cols[5].button(
+                    "Edit", key=f"row_{i}_edit_btn",
+                    on_click=partial(set_row_edit_true, i)
+                )
+            else:
+                row_cols[5].button(
+                    "Cancel", key=f"row_{i}_cancel_btn",
+                    on_click=partial(set_row_edit_false, i, pending_row_key, st.session_state.line_items[i])
+                )
         else:
-            cols_hdr[j].text_input(
-                aria, st.session_state[pending_row_key][field],
-                key=f"{aria}_input", disabled=True, label_visibility="collapsed")
+            row_cols[5].markdown("")
 
-    conf_color = "#dc3545" if cf < thr else "#28a745"
-    cols_hdr[4].markdown(
-        f"<span style='color:{conf_color}; font-weight:bold;'>{cf:.2f}</span>",
-        unsafe_allow_html=True)
-    # Only one edit/cancel per row in last col
-    if cf >= thr:
-        btn_label = "Cancel" if edit else "Edit"
-        if not edit:
-            cols_hdr[5].button(
-                "Edit", key=f"row_{i}_edit_btn",
-                on_click=partial(set_row_edit_true, i)
-            )
-        else:
-            cols_hdr[5].button(
-                "Cancel", key=f"row_{i}_cancel_btn",
-                on_click=partial(set_row_edit_false, i, pending_row_key, st.session_state.line_items[i])
-            )
-    else:
-        # For low-confidence rows, do NOT show any button. Editable always True.
-        cols_hdr[5].markdown("")
+    # Minimal gap
+    st.markdown("<div style='margin-bottom:-12px'></div>", unsafe_allow_html=True)
+    main_any_edit = any(st.session_state.get(f"{v_key}_editing", False) for _, v_key, _ in fields)
+    any_row_edit = any(st.session_state.row_editing)
 
-# --------- VALIDATE and SHOW OUTPUT ---------
-main_any_edit = any(st.session_state.get(f"{v_key}_editing", False) for _,v_key,_ in fields)
-if main_any_edit or any_row_edit:
-    st.markdown("---")
-    cols = st.columns([5, 2, 5])  # Center layout
+    # Now Validate button, inside .container!
+    cols = st.columns([5, 2, 5], gap="small")
     with cols[1]:
-        validate_clicked = st.button(":white_check_mark: Validate (Save All Edits)", key="validate_btn")
+        validate_enabled = main_any_edit or any_row_edit
+        validate_clicked = st.button(
+            ":white_check_mark: Validate (Save All Edits)",
+            key="validate_btn",
+            disabled=not validate_enabled
+        )
     if validate_clicked:
         for _, v_key, _ in fields:
             st.session_state[v_key] = st.session_state[f"{v_key}_pending"]
@@ -262,6 +337,7 @@ if main_any_edit or any_row_edit:
             st.session_state.row_editing[i] = False
         st.session_state.show_validated = True
         st.rerun()
+
 
 if st.session_state.show_validated:
     st.markdown("----")
